@@ -1,6 +1,8 @@
 package jobinator
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"testing"
 
@@ -50,6 +52,17 @@ func BenchmarkMsgPackSimple(b *testing.B) {
 	return
 }
 
+func BenchmarkGobSimple(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		b := &bytes.Buffer{}
+		gobencoder := gob.NewEncoder(b)
+		gobdecoder := gob.NewDecoder(b)
+		gobencoder.Encode(td)
+		t2 := &testData{}
+		gobdecoder.Decode(t2)
+	}
+}
+
 func BenchmarkJsonComplex(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		by, err := json.Marshal(td2)
@@ -80,3 +93,13 @@ func BenchmarkMsgPackComplex(b *testing.B) {
 	return
 }
 
+func BenchmarkGobComplex(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		b := &bytes.Buffer{}
+		gobencoder := gob.NewEncoder(b)
+		gobdecoder := gob.NewDecoder(b)
+		gobencoder.Encode(td2)
+		t2 := &testData2{}
+		gobdecoder.Decode(t2)
+	}
+}
